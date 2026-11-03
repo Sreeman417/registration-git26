@@ -6,6 +6,8 @@ const MIN_TEAM_MEMBERS = 2;
 const MAX_TEAM_MEMBERS = 3;
 const REGISTRATION_TYPES = ['online', 'onsite'];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Organisers sign in to the event app with this address, so no participant may register it.
+const RESERVED_EMAILS = ['admin@psgtech.ac.in'];
 const DUPLICATE_KEY_ERROR = 11000;
 const DUPLICATE_EMAIL_MESSAGE = 'One of these email addresses is already registered.';
 
@@ -35,6 +37,7 @@ export function parseTeamPayload(body) {
     if (!EMAIL_PATTERN.test(email) || !email.endsWith(REQUIRED_EMAIL_DOMAIN)) {
       return { error: `Every member needs an email ending in ${REQUIRED_EMAIL_DOMAIN}.` };
     }
+    if (RESERVED_EMAILS.includes(email)) return { error: `${email} is reserved for organisers. Use a different email.` };
     if (seenEmails.has(email)) return { error: 'Each member needs a different email address.' };
     if (!isStrongPassword(password)) {
       return { error: 'Passwords need at least 8 characters with a letter and a number.' };
